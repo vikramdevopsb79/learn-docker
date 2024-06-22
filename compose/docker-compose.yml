@@ -1,0 +1,56 @@
+name: expense
+
+services:
+  frontend:
+    container_name: Frontend
+    pull_policy: always
+    image: docker.io/saivikram2020251/frontend
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+    networks:
+      - common
+  backend:
+    container_name: backend
+    image: docker.io/saivikram2020251/backend
+    ports:
+      - 8080:8080
+    depends_on:
+      - schema
+      - mysql
+    environment:
+      DB_HOST: "mysql"
+    networks:
+      - common
+  schema:
+    container_name: schema
+    image: docker.io/saivikram2020251/schema-load
+    depends_on:
+      - mysql
+    environment:
+      login_user: "root"
+      login_password: "ExpenseApp@1"
+      login_host: "mysql"
+      app_repo: https://github.com/vikramdevopsb79/expense-backend
+      schema_file: /app/schema/backend.sql
+    networks:
+      - common
+  mysql:
+    container_name: mysql
+    image: docker.io/mysql:8.0
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "ExpenseApp@1"
+    networks:
+      - common
+networks:
+  common:
+
+# To test whether containers communicating or not
+#  sleep:
+#    image: docker.io/saivikram2020251/schema-load
+#    entrypoint: sleep 10000
+# in work station we login into sleep container and check ping mysql to check host exist or not
+
